@@ -7,8 +7,7 @@ The objective was to build a scalable, segmented, and secure network infrastruct
 
 Key highlights include strict **VLAN segmentation**, **OSPF routing**, **NAT for WAN access**, and **Hardened Security Policies** (ACLs) that restrict management access while maintaining service availability.
 
-![Topology Diagram](documentation/topology.png)
-*(Replace this line with your actual topology screenshot)*
+![Topology Diagram](documentation/branch_topology.png)
 
 ---
 
