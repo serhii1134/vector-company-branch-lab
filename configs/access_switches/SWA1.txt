@@ -1,3 +1,7 @@
+Current configuration : 4837 bytes
+!
+! Last configuration change at 15:29:08 UTC Tue Mar 3 2026 by serhii
+!
 version 15.2
 service timestamps debug datetime msec
 service timestamps log datetime msec
@@ -30,16 +34,20 @@ aaa session-id common
 !
 !
 no ip routing
+ip arp inspection vlan 10,20,30,40,50,60,70,80
 !
 !
 !
+ip dhcp snooping vlan 10,20,30,40,50,60,70,80
+no ip dhcp snooping information option
+ip dhcp snooping
 no ip domain-lookup
 ip domain-name vector.local
-no ip cef
+no ip cef 
 no ipv6 cef
 !
 !
-!         
+!
 spanning-tree mode rapid-pvst
 spanning-tree extend system-id
 !
@@ -63,7 +71,9 @@ interface GigabitEthernet0/0
  switchport trunk encapsulation dot1q
  switchport trunk native vlan 999
  switchport mode trunk
+ ip arp inspection trust
  negotiation auto
+ ip dhcp snooping trust
 !
 interface GigabitEthernet0/1
  description LINK_TO_SWC2
@@ -71,16 +81,23 @@ interface GigabitEthernet0/1
  switchport trunk encapsulation dot1q
  switchport trunk native vlan 999
  switchport mode trunk
+ ip arp inspection trust
  negotiation auto
+ ip dhcp snooping trust
 !
 interface GigabitEthernet0/2
  description OFFICE_ADMINS_PC
  switchport access vlan 10
  switchport mode access
  switchport nonegotiate
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 5254.0071.d0ba
+ switchport port-security
  negotiation auto
  spanning-tree portfast edge
  spanning-tree bpduguard enable
+ ip dhcp snooping limit rate 10
 !
 interface GigabitEthernet0/3
  description UNUSED
@@ -95,7 +112,7 @@ interface GigabitEthernet1/0
  switchport mode access
  shutdown
  negotiation auto
-!
+!         
 interface GigabitEthernet1/1
  description UNUSED
  switchport access vlan 100
@@ -141,7 +158,7 @@ ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
 !
 !
 control-plane
-!
+!         
 banner exec ^C
 IOSv - Cisco Systems Confidential -
 
@@ -150,14 +167,14 @@ Supplemental End User License Restrictions
 This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
 
 By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
-^C        
+^C
 banner incoming ^C
 IOSv - Cisco Systems Confidential -
 
 Supplemental End User License Restrictions
 
 This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
-
+          
 By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
 ^C
 banner login ^C
@@ -166,7 +183,7 @@ IOSv - Cisco Systems Confidential -
 Supplemental End User License Restrictions
 
 This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
-          
+
 By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
 ^C
 banner motd ^C^C
