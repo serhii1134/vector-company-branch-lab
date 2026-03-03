@@ -15,7 +15,7 @@ Key highlights include strict **VLAN segmentation**, **OSPF routing**, **NAT for
 * **Platform:** Cisco Modeling Labs (CML)
 * **Routing & Switching:** Cisco IOS (L2/L3 Switching, OSPF Area 0, NAT).
 * **Infrastructure Services:** Ubuntu Linux 24.04 LTS, `isc-dhcp-server`.
-* **Security:** Extended Access Control Lists (ACLs), SSH Management.
+* **Security:** Extended Access Control Lists (ACLs), DHCP Snooping, Dynamic ARP Inspection (DAI), Port Security.
 
 
 ---
@@ -67,14 +67,13 @@ ip access-list extended RESTRICT_USERS
  ! Permit Internet/WAN traffic
  permit ip any any
 
-### 3. Layer 2 Security Hardening
-Implemented Layer 2 security features at the access edge to protect against spoofing and unauthorized network access.
+### 3. Layer 2 Security Hardening ("The Holy Trinity")
+Hardening was focused strictly on the access switches to prevent internal attacks.
 
-* **DHCP Snooping:** Configured on access switches to build a trusted IP-to-MAC binding database.
-  * *Challenge:* Enabling Snooping on the Core Switch interfered with its `ip helper-address` (DHCP Relay) process, causing it to drop `DHCPDISCOVER` broadcasts.
-  * *Solution:* Removed Snooping from the Core to allow standard relay routing. Enforced Snooping strictly at the Access Layer and configured trunk uplinks as `trusted` to allow server replies.
-* **Dynamic ARP Inspection (DAI):** Enabled on user VLANs to prevent ARP poisoning by validating packets against the DHCP Snooping database. Trunk uplinks were configured as `trust` ports to ensure legitimate default gateway ARP replies from the Core Switch are not dropped.
-* **Port Security:** Locked down user-facing access ports to prevent unauthorized device connections.
-  * Restricted ports to `maximum 1` MAC address.
-  * Enabled `mac-address sticky` to retain the learned MAC in the running configuration.
-  * Configured `violation restrict` to drop unauthorized traffic and log the event without putting the physical port into an error-disabled state.
+* **DHCP Snooping:** * Builds a trusted IP-to-MAC binding database. 
+  * **Architectural Lesson:** Snooping was removed from the Core switch after it was found to interfere with the Relay Agent process (dropping DISCOVER packets). Snooping is now enforced only at the access edge.
+* **Dynamic ARP Inspection (DAI):** * Validates ARP packets against the Snooping database. 
+  * Trunk ports toward the Core are configured as `trusted` to ensure ARP replies from the default gateway are not dropped.
+* **Port Security:** * Limits ports to a `maximum 1` MAC address.
+  * `sticky` learning is enabled to persist the authorized MAC in the config.
+  * Violation mode is set to `restrict` to drop rogue traffic and log alerts without disabling the physical interface.
