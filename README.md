@@ -12,11 +12,10 @@ Key highlights include strict **VLAN segmentation**, **OSPF routing**, **NAT for
 ---
 
 ## 🛠 Technologies & Tools Used
-* **Platform:** Cisco Modeling Labs (CML)
-* **Routing & Switching:** Cisco IOS (L2/L3 Switching, OSPF Area 0, NAT).
-* **Infrastructure Services:** Ubuntu Linux 24.04 LTS, `isc-dhcp-server`.
-* **Security:** Extended Access Control Lists (ACLs), DHCP Snooping, Dynamic ARP Inspection (DAI), Port Security.
-
+- **Platform:** Cisco Modeling Labs (CML)
+- **Routing & Switching:** Cisco IOS (L2/L3 Switching, OSPF Area 0, NAT)
+- **Infrastructure Services:** Ubuntu Linux 24.04 LTS, `isc-dhcp-server`
+- **Security:** Extended Access Control Lists (ACLs), DHCP Snooping, Dynamic ARP Inspection (DAI), Port Security
 
 ---
 
@@ -42,30 +41,16 @@ The network is segmented into functional departments to minimize broadcast domai
 
 ### 1. Centralized DHCP on Linux (Ubuntu)
 Instead of using Cisco routers for DHCP, I deployed a dedicated Ubuntu Server running `isc-dhcp-server`.
-* **Configuration:** Custom scopes defined in `/etc/dhcp/dhcpd.conf`.
-* **Challenge:** Enabling DHCP clients across different VLANs to reach the server.
-* **Solution:** Configured **IP Helper Addresses** (`ip helper-address 10.5.50.10`) on the Core Switch SVIs to relay broadcast traffic as unicast to the server.
+
+- **Configuration:** Custom scopes defined in `/etc/dhcp/dhcpd.conf`
+- **Challenge:** Enabling DHCP clients across different VLANs to reach the server
+- **Solution:** Configured **IP Helper Addresses** (`ip helper-address 10.5.50.10`) on the Core Switch SVIs to relay broadcast traffic as unicast to the server
 
 ### 2. Security Segmentation (ACLs)
 A critical requirement was to prevent standard users (HR, Finance, Guests) from accessing the Server VLAN, while strictly allowing the IT Department full management access.
 
-* **The Problem:** Blocking "All Traffic" from User VLANs to Server VLANs accidentally blocked **DHCP Requests** (UDP Port 67), causing clients to fail IP addressing.
-* **The "Pin-Hole" Solution:** Implemented an Extended ACL that explicitly permits DHCP traffic before the Deny statement.
-
-**Code Snippet (Core Switch):**
-```cisco
-ip access-list extended RESTRICT_USERS
- ! Allow IT Department full access
- permit ip 10.5.60.0 0.0.0.255 any
- 
- ! CRITICAL: Allow DHCP Requests to pass through to Server
- permit udp any host 10.5.50.10 eq bootps
- 
- ! Deny all other VLANs from accessing Server Subnet
- deny   ip 10.5.0.0 0.0.255.255 10.5.50.0 0.0.0.255
- 
- ! Permit Internet/WAN traffic
- permit ip any any
+- **The Problem:** Blocking "All Traffic" from User VLANs to Server VLANs accidentally blocked **DHCP Requests** (UDP Port 67), causing clients to fail IP addressing.
+- **The "Pin-Hole" Solution:** Implemented an Extended ACL that explicitly permits DHCP traffic before the Deny statement.
 
 ### 3. Layer 2 Security Hardening ("The Holy Trinity")
 Hardening was focused strictly on the access switches to prevent internal attacks.
@@ -77,3 +62,18 @@ Hardening was focused strictly on the access switches to prevent internal attack
 * **Port Security:** * Limits ports to a `maximum 1` MAC address.
   * `sticky` learning is enabled to persist the authorized MAC in the config.
   * Violation mode is set to `restrict` to drop rogue traffic and log alerts without disabling the physical interface.
+
+**Code Snippet (Core Switch):**
+```cisco
+ip access-list extended RESTRICT_USERS
+ ! Allow IT Department full access
+ permit ip 10.5.60.0 0.0.0.255 any
+
+ ! CRITICAL: Allow DHCP Requests to pass through to Server
+ permit udp any host 10.5.50.10 eq bootps
+
+ ! Deny all other VLANs from accessing Server Subnet
+ deny   ip 10.5.0.0 0.0.255.255 10.5.50.0 0.0.0.255
+
+ ! Permit Internet/WAN traffic
+ permit ip any any
