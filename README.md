@@ -62,18 +62,3 @@ Hardening was focused strictly on the access switches to prevent internal attack
 * **Port Security:** * Limits ports to a `maximum 1` MAC address.
   * `sticky` learning is enabled to persist the authorized MAC in the config.
   * Violation mode is set to `restrict` to drop rogue traffic and log alerts without disabling the physical interface.
-
-**Code Snippet (Core Switch):**
-```cisco
-ip access-list extended RESTRICT_USERS
- ! Allow IT Department full access
- permit ip 10.5.60.0 0.0.0.255 any
-
- ! CRITICAL: Allow DHCP Requests to pass through to Server
- permit udp any host 10.5.50.10 eq bootps
-
- ! Deny all other VLANs from accessing Server Subnet
- deny   ip 10.5.0.0 0.0.255.255 10.5.50.0 0.0.0.255
-
- ! Permit Internet/WAN traffic
- permit ip any any
