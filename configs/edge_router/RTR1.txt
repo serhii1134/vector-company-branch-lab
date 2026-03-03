@@ -117,7 +117,7 @@ memory free low-watermark processor 71464
 !
 spanning-tree extend system-id
 !
-username serhii privilege 15 secret 9 $9$FeE/6nkmA5qhNk$0B84HZLU8iXJ.bmpnI8f0DsWzOGsTNKlMbRdhzQ5lm.
+username [-----] privilege 15 secret 9 [-----]
 !
 redundancy
 !

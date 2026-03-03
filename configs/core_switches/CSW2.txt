@@ -11,7 +11,7 @@ boot-end-marker
 !
 !
 !
-username serhii privilege 15 secret 5 $1$1y16$Nkpb/W9IprxctDqqXxA1N0
+username [-----] privilege 15 secret 9 [-----]
 aaa new-model
 !
 !
